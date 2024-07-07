@@ -98,14 +98,18 @@ const createEvent = asyncHandler(async (req, res) => {
 });
 
 const createCheckoutSession = asyncHandler(async (req, res) => {
-	// find event using the req.body.eventId & check it is not paid
+	const id = parseInt(req.body.id);
+	const event = await prisma.event.findUnique({where: {id}});
 
-	const price = 499;
-	const event = {
-		id: 1,
-		title: "AR Rahman Concert",
-		thumbnailUrl: "https://res.cloudinary.com/dv68nyejy/image/upload/v1712380759/Evento/thumbnail/b_praak2_opndqq.webp",
-	};
+	if (event?.plan !== null) throw new ApiError(400, "Plan already exists!");
+
+	let price;
+
+	if (req.body?.plan === "BASIC") {
+		price = 499;
+	} else {
+		price = 999;
+	}
 
 	const session = await stripe.checkout.sessions.create({
 		line_items: [
@@ -116,7 +120,7 @@ const createCheckoutSession = asyncHandler(async (req, res) => {
 					product_data: {
 						name: event?.title,
 						description: "BASIC Plan",
-						images: [event?.thumbnailUrl], // This should be a live url
+						images: [event?.bannerUrl], // This should be a live url
 					},
 				},
 				quantity: 1,
@@ -146,6 +150,48 @@ const createCheckoutSession = asyncHandler(async (req, res) => {
 	});
 });
 
+const createEventCheckout = async (session) => {
+	let plan = "BASIC";
+	const eventId = parseInt(session.client_reference_id);
+
+	if (session?.amount_total / 100 === 499) {
+		plan = "BASIC";
+	} else {
+		plan = "PREMIUM";
+	}
+
+	const event = await prisma.event.findUnique({
+		where: {id: eventId},
+	});
+
+	if (event) {
+		await prisma.event.update({
+			where: {id: eventId},
+			data: {plan, status: "UNDER_REVIEW"},
+		});
+	}
+};
+
+const webhookCheckout = async (req, res) => {
+	const signature = req.headers["stripe-signature"];
+
+	let event;
+
+	try {
+		event = stripe.webhooks.constructEvent(req.body, signature, process.env.STRIPE_WEBHOOK_SECRET);
+
+		if (event.type === "checkout.session.completed") {
+			createEventCheckout(event.data.object);
+		}
+		res.status(200).json({received: true});
+	} catch (err) {
+		return res.status(400).json({
+			status: "failed",
+			error: `Webhook Error: ${err.message}`,
+		});
+	}
+};
+
 module.exports = {
 	getSingleEvent,
 	getAllEvents,
@@ -153,4 +199,5 @@ module.exports = {
 	uploadEventThumbnail,
 	createEvent,
 	createCheckoutSession,
+	webhookCheckout,
 };

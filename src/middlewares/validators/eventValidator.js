@@ -3,7 +3,6 @@ const ApiError = require("../../utils/ApiError");
 const validationErrorsFormatter = require("../../utils/validationErrorsFormatter");
 
 const createEventValidator = (req, res, next) => {
-	const validPlans = ["BASIC", "PREMIUM"];
 	const createEventSchema = Joi.object({
 		title: Joi.string().max(255).required().messages({
 			"string.base": "Title must be a string",
@@ -13,11 +12,6 @@ const createEventValidator = (req, res, next) => {
 		description: Joi.string().required().messages({
 			"string.base": "Description must be a string",
 			"any.required": "Description is required",
-		}),
-		thumbnailUrl: Joi.string().uri().required().messages({
-			"string.base": "Thumbnail URL must be a string",
-			"string.uri": "Thumbnail URL must be a valid URI",
-			"any.required": "Thumbnail URL is required",
 		}),
 		bannerUrl: Joi.string().uri().required().messages({
 			"string.base": "Banner URL must be a string",
@@ -66,12 +60,6 @@ const createEventValidator = (req, res, next) => {
 			"string.base": "Organizer phone must be a string",
 			"any.required": "Organizer phone is required",
 		}),
-		plan: Joi.string()
-			.valid(...validPlans)
-			.required()
-			.messages({
-				"any.only": 'Plan must be either "BASIC" or "PREMIUM"',
-			}),
 		categories: Joi.array()
 			.items(
 				Joi.number().integer().required().messages({
