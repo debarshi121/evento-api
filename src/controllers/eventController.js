@@ -9,7 +9,29 @@ const stripe = require("stripe")(STRIPE_SECRET_KEY);
 
 const getSingleEvent = asyncHandler(async (req, res) => {
 	const id = parseInt(req.params.id);
-	const event = await prisma.event.findUnique({where: {id}});
+	let event = await prisma.event.findUnique({
+		where: {id},
+		include: {
+			categories: {
+				include: {
+					category: {
+						select: {
+							id: true,
+							title: true,
+						},
+					},
+				},
+			},
+		},
+	});
+
+	event = {
+		...event,
+		categories: event.categories?.map((eventCategory) => ({
+			id: eventCategory.category.id,
+			title: eventCategory.category.title,
+		})),
+	};
 
 	if (!event) throw new ApiError(404, "Event not found!");
 
