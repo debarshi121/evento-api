@@ -53,6 +53,7 @@ model Event {
   userId         Int
   user           User            @relation(fields: [userId], references: [id])
   status         Status
+  emergencyInfos  EmergencyInfo[]
 }
 
 model Category {
@@ -83,4 +84,14 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Event     Event[]
+}
+
+model EmergencyInfo {
+  id          Int      @id @default(autoincrement())
+  eventId     Int
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  event       Event    @relation(fields: [eventId], references: [id])
 }

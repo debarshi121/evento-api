@@ -15,10 +15,10 @@ const PORT = config.SERVER.PORT;
 const app = express();
 const httpServer = createServer(app);
 
-const { webhookCheckout } = require("./controllers/eventController");
+const {webhookCheckout} = require("./controllers/eventController");
 
 // This api will be called from Stripe Webhook after a successfull payment
-app.post("/api/v1/events/webhook-checkout", express.raw({ type: "application/json" }), webhookCheckout);
+app.post("/api/v1/events/webhook-checkout", express.raw({type: "application/json"}), webhookCheckout);
 
 const whitelist = config.WHITELIST ? config.WHITELIST.split(",") : [];
 
@@ -51,10 +51,12 @@ app.use(helmet());
 const authRouter = require("./routes/authRoutes");
 const eventRouter = require("./routes/eventRoutes");
 const homeRouter = require("./routes/homeRoutes");
+const emergencyInfoRouter = require("./routes/emergencyInfoRoutes");
 
 app.use(`/api/v1/auth`, authRouter);
 app.use(`/api/v1/events`, eventRouter);
 app.use(`/api/v1/home`, homeRouter);
+app.use(`/api/v1/emergency-info`, emergencyInfoRouter);
 
 app.get("/", (req, res) => {
 	res.status(200).json({message: "Welcome to evento API"});
