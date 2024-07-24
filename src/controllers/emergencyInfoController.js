@@ -4,18 +4,6 @@ const ApiError = require("../utils/ApiError");
 const prisma = require("../prisma");
 const {UserRoles, EventStatus} = require("../utils/constants");
 
-const getAllEmergencyInfo = asyncHandler(async (req, res) => {
-	const eventId = parseInt(req.params.eventId);
-
-	const emergencyInfos = await prisma.emergencyInfo.findMany({
-		where: {
-			eventId,
-		},
-	});
-
-	return res.status(200).json(new ApiResponse(200, {emergencyInfos}));
-});
-
 const createUpdateEmergencyInfo = asyncHandler(async (req, res) => {
 	const {eventId, emergencyInfo} = req.body;
 	const event = await prisma.event.findUnique({where: {id: eventId}});
@@ -51,6 +39,5 @@ const createUpdateEmergencyInfo = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-	getAllEmergencyInfo,
 	createUpdateEmergencyInfo,
 };

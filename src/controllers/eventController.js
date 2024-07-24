@@ -24,7 +24,6 @@ const getSingleEvent = asyncHandler(async (req, res) => {
 			},
 			emergencyInfos: {
 				select: {
-					id: true,
 					title: true,
 					description: true,
 				},

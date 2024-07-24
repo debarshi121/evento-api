@@ -21,9 +21,8 @@ const createEmergencyInfoValidator = (req, res, next) => {
 			"number.base": "Event ID must be a number",
 			"any.required": "Event ID is required",
 		}),
-		emergencyInfo: Joi.array().items(emergencyInfoSchema).min(1).required().messages({
+		emergencyInfo: Joi.array().items(emergencyInfoSchema).required().messages({
 			"array.base": "Emergency info must be an array",
-			"array.min": "Emergency info must contain at least one object",
 			"any.required": "Emergency info is required",
 		}),
 	});
