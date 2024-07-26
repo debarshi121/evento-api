@@ -52,11 +52,13 @@ const authRouter = require("./routes/authRoutes");
 const eventRouter = require("./routes/eventRoutes");
 const homeRouter = require("./routes/homeRoutes");
 const emergencyInfoRouter = require("./routes/emergencyInfoRoutes");
+const instructionRouter = require("./routes/instructionRoutes");
 
 app.use(`/api/v1/auth`, authRouter);
 app.use(`/api/v1/events`, eventRouter);
 app.use(`/api/v1/home`, homeRouter);
 app.use(`/api/v1/emergency-info`, emergencyInfoRouter);
+app.use(`/api/v1/instruction`, instructionRouter);
 
 app.get("/", (req, res) => {
 	res.status(200).json({message: "Welcome to evento API"});

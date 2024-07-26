@@ -28,6 +28,11 @@ const getSingleEvent = asyncHandler(async (req, res) => {
 					description: true,
 				},
 			},
+			instructions: {
+				select: {
+					title: true,
+				},
+			},
 		},
 	});
 
