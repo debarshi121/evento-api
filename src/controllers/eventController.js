@@ -36,6 +36,8 @@ const getSingleEvent = asyncHandler(async (req, res) => {
 		},
 	});
 
+	if (!event) throw new ApiError(404, "Event not found!");
+
 	event = {
 		...event,
 		categories: event.categories?.map((eventCategory) => ({
@@ -43,8 +45,6 @@ const getSingleEvent = asyncHandler(async (req, res) => {
 			title: eventCategory.category.title,
 		})),
 	};
-
-	if (!event) throw new ApiError(404, "Event not found!");
 
 	return res.status(200).json(new ApiResponse(200, event));
 });
@@ -128,6 +128,27 @@ const createEvent = asyncHandler(async (req, res) => {
 	});
 
 	return res.status(200).json(new ApiResponse(200, {event}, "Event created successfully"));
+});
+
+const updateEvent = asyncHandler(async (req, res) => {
+	const eventId = parseInt(req.params.id);
+
+	const {organizerName, organizerEmail, organizerPhone} = req.body;
+
+	const data = {organizerName, organizerEmail, organizerPhone};
+
+	const event = await prisma.event.findUnique({
+		where: {id: eventId},
+	});
+
+	if (!event) throw new ApiError(404, "Event not found!");
+
+	await prisma.event.update({
+		where: {id: eventId},
+		data,
+	});
+
+	return getSingleEvent(req, res);
 });
 
 const createCheckoutSession = asyncHandler(async (req, res) => {
@@ -231,6 +252,7 @@ module.exports = {
 	uploadEventBanner,
 	uploadEventThumbnail,
 	createEvent,
+	updateEvent,
 	createCheckoutSession,
 	webhookCheckout,
 };
