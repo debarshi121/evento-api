@@ -88,22 +88,6 @@ const uploadEventBanner = asyncHandler(async (req, res) => {
 	return res.status(200).json(new ApiResponse(200, {url: banner?.url}, "Avatar image updated successfully"));
 });
 
-const uploadEventThumbnail = asyncHandler(async (req, res) => {
-	const fileLocalPath = req.file?.path;
-
-	if (!fileLocalPath) {
-		throw new ApiError(400, "File is missing");
-	}
-
-	const thumbnail = await uploadOnCloudinary(fileLocalPath, "evento/thumbnails");
-
-	if (!thumbnail?.url) {
-		throw new ApiError(400, "Error while uploading on avatar");
-	}
-
-	return res.status(200).json(new ApiResponse(200, {url: thumbnail?.url}, "Avatar image updated successfully"));
-});
-
 const createEvent = asyncHandler(async (req, res) => {
 	const data = {
 		...req.body,
@@ -133,20 +117,44 @@ const createEvent = asyncHandler(async (req, res) => {
 const updateEvent = asyncHandler(async (req, res) => {
 	const eventId = parseInt(req.params.id);
 
-	const {organizerName, organizerEmail, organizerPhone} = req.body;
+	const {bannerUrl, videoUrl, categories, venue, startDate, endDate, entryFee, latitude, longitude, organizerName, organizerEmail, organizerPhone} = req.body;
 
-	const data = {organizerName, organizerEmail, organizerPhone};
+	const data = {bannerUrl, videoUrl, categories, venue, startDate, endDate, entryFee, latitude, longitude, organizerName, organizerEmail, organizerPhone};
 
 	const event = await prisma.event.findUnique({
 		where: {id: eventId},
 	});
 
+	// if it is a new banner, delete old banner from cloudinary
+
+	// update categories
+	if (categories.length) {
+		const dataToInsert = categories.map((item) => {
+			return {
+				eventId,
+				categoryId: item,
+			};
+		});
+
+		await prisma.$transaction(async (prisma) => {
+			await prisma.eventCategory.deleteMany({
+				where: {
+					eventId,
+				},
+			});
+
+			await prisma.eventCategory.createMany({
+				data: dataToInsert,
+			});
+		});
+	}
+
 	if (!event) throw new ApiError(404, "Event not found!");
 
-	await prisma.event.update({
-		where: {id: eventId},
-		data,
-	});
+	// await prisma.event.update({
+	// 	where: {id: eventId},
+	// 	data,
+	// });
 
 	return getSingleEvent(req, res);
 });
@@ -250,7 +258,6 @@ module.exports = {
 	getSingleEvent,
 	getAllEvents,
 	uploadEventBanner,
-	uploadEventThumbnail,
 	createEvent,
 	updateEvent,
 	createCheckoutSession,

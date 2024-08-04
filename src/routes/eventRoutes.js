@@ -1,5 +1,5 @@
 const express = require("express");
-const {getSingleEvent, getAllEvents, uploadEventBanner, uploadEventThumbnail, createEvent, createCheckoutSession, updateEvent} = require("../controllers/eventController");
+const {getSingleEvent, getAllEvents, uploadEventBanner, createEvent, createCheckoutSession, updateEvent} = require("../controllers/eventController");
 const {verifyJWT, verifyRoles} = require("../middlewares/authMiddleware");
 const {UserRolesEnum} = require("../utils/constants");
 const upload = require("../middlewares/multerMiddleware");
@@ -13,6 +13,5 @@ router.post("/checkout-session", createCheckoutSession);
 router.get("/:id", getSingleEvent);
 router.put("/:id", updateEventValidator, updateEvent);
 router.post("/upload-banner", upload.single("banner"), uploadEventBanner);
-router.post("/upload-thumbnail", upload.single("thumbnail"), uploadEventThumbnail);
 
 module.exports = router;
