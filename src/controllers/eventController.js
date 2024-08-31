@@ -6,6 +6,15 @@ const uploadOnCloudinary = require("../utils/cloudinary");
 const {STRIPE_SUCCESS_URL, STRIPE_SECRET_KEY, STRIPE_CANCEL_URL} = require("../config");
 const {UserRoles, EventStatus} = require("../utils/constants");
 const stripe = require("stripe")(STRIPE_SECRET_KEY);
+const slugify = require("slugify");
+
+const generateSlug = (title) => {
+	return slugify(title, {
+		lower: true,
+		strict: true,
+		trim: true,
+	});
+};
 
 const getSingleEvent = asyncHandler(async (req, res) => {
 	const id = parseInt(req.params.id);
@@ -91,6 +100,7 @@ const uploadEventBanner = asyncHandler(async (req, res) => {
 const createEvent = asyncHandler(async (req, res) => {
 	const data = {
 		...req.body,
+		slug: generateSlug(req.body.title),
 		userId: req.user?.id,
 		status: EventStatus.PAYMENT_PENDING,
 		entryFee: Number(req.body.entryFee),
@@ -117,9 +127,9 @@ const createEvent = asyncHandler(async (req, res) => {
 const updateEvent = asyncHandler(async (req, res) => {
 	const eventId = parseInt(req.params.id);
 
-	const {bannerUrl, videoUrl, categories, venue, startDate, endDate, entryFee, latitude, longitude, organizerName, organizerEmail, organizerPhone} = req.body;
+	const {title, description, slug, bannerUrl, videoUrl, categories, venue, startDate, endDate, entryFee, latitude, longitude, organizerName, organizerEmail, organizerPhone} = req.body;
 
-	const data = {bannerUrl, videoUrl, categories, venue, startDate, endDate, entryFee, latitude, longitude, organizerName, organizerEmail, organizerPhone};
+	const data = {title, description, slug, bannerUrl, videoUrl, categories, venue, startDate, endDate, entryFee, latitude, longitude, organizerName, organizerEmail, organizerPhone};
 
 	const event = await prisma.event.findUnique({
 		where: {id: eventId},
@@ -128,7 +138,7 @@ const updateEvent = asyncHandler(async (req, res) => {
 	// if it is a new banner, delete old banner from cloudinary
 
 	// update categories
-	if (categories.length) {
+	if (categories?.length) {
 		const dataToInsert = categories.map((item) => {
 			return {
 				eventId,
@@ -151,10 +161,10 @@ const updateEvent = asyncHandler(async (req, res) => {
 
 	if (!event) throw new ApiError(404, "Event not found!");
 
-	// await prisma.event.update({
-	// 	where: {id: eventId},
-	// 	data,
-	// });
+	await prisma.event.update({
+		where: {id: eventId},
+		data,
+	});
 
 	return getSingleEvent(req, res);
 });

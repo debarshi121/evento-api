@@ -5,103 +5,104 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 enum Plan {
-  BASIC
-  PREMIUM
+    BASIC
+    PREMIUM
 }
 
 enum Role {
-  USER
-  MANAGER
-  ADMIN
+    USER
+    MANAGER
+    ADMIN
 }
 
 enum Status {
-  PAYMENT_PENDING
-  UNDER_REVIEW
-  LIVE
+    PAYMENT_PENDING
+    UNDER_REVIEW
+    LIVE
 }
 
 model Event {
-  id             Int             @id @default(autoincrement())
-  title          String          @db.VarChar(255)
-  description    String
-  bannerUrl      String
-  videoUrl       String?
-  venue          String
-  startDate      DateTime
-  endDate        DateTime?
-  entryFee       Int
-  latitude       Float
-  longitude      Float
-  organizerName  String
-  organizerEmail String
-  organizerPhone String
-  plan           Plan?
-  published      Boolean         @default(false)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  categories     EventCategory[]
-  userId         Int
-  user           User            @relation(fields: [userId], references: [id])
-  status         Status
-  emergencyInfos  EmergencyInfo[]
-  instructions  Instruction[]
+    id             Int             @id @default(autoincrement())
+    title          String          @db.VarChar(255)
+    description    String
+    slug           String
+    bannerUrl      String
+    videoUrl       String?
+    venue          String
+    startDate      DateTime
+    endDate        DateTime?
+    entryFee       Int
+    latitude       Float
+    longitude      Float
+    organizerName  String
+    organizerEmail String
+    organizerPhone String
+    plan           Plan?
+    published      Boolean         @default(false)
+    createdAt      DateTime        @default(now())
+    updatedAt      DateTime        @updatedAt
+    categories     EventCategory[]
+    userId         Int
+    user           User            @relation(fields: [userId], references: [id])
+    status         Status
+    emergencyInfos EmergencyInfo[]
+    instructions   Instruction[]
 }
 
 model Category {
-  id        Int             @id @default(autoincrement())
-  title     String          @unique
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-  events    EventCategory[]
+    id        Int             @id @default(autoincrement())
+    title     String          @unique
+    createdAt DateTime        @default(now())
+    updatedAt DateTime        @updatedAt
+    events    EventCategory[]
 }
 
 model EventCategory {
-  event      Event    @relation(fields: [eventId], references: [id])
-  eventId    Int
-  category   Category @relation(fields: [categoryId], references: [id])
-  categoryId Int
-  assignedAt DateTime @default(now())
+    event      Event    @relation(fields: [eventId], references: [id])
+    eventId    Int
+    category   Category @relation(fields: [categoryId], references: [id])
+    categoryId Int
+    assignedAt DateTime @default(now())
 
-  @@id([eventId, categoryId])
+    @@id([eventId, categoryId])
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Event     Event[]
+    id        Int      @id @default(autoincrement())
+    name      String
+    email     String   @unique
+    password  String
+    role      Role     @default(USER)
+    isActive  Boolean  @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    Event     Event[]
 }
 
 model EmergencyInfo {
-  id          Int      @id @default(autoincrement())
-  eventId     Int
-  title       String
-  description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  event       Event    @relation(fields: [eventId], references: [id])
+    id          Int      @id @default(autoincrement())
+    eventId     Int
+    title       String
+    description String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    event       Event    @relation(fields: [eventId], references: [id])
 }
 
 model Instruction {
-  id          Int      @id @default(autoincrement())
-  eventId     Int
-  title       String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  event       Event    @relation(fields: [eventId], references: [id])
+    id        Int      @id @default(autoincrement())
+    eventId   Int
+    title     String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    event     Event    @relation(fields: [eventId], references: [id])
 }

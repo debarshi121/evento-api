@@ -84,15 +84,19 @@ const createEventValidator = (req, res, next) => {
 
 const updateEventValidator = (req, res, next) => {
 	const updateEventSchema = Joi.object({
-		// title: Joi.string().max(255).required().messages({
-		// 	"string.base": "Title must be a string",
-		// 	"string.max": "Title must be at most 255 characters long",
-		// 	"any.required": "Title is required",
-		// }),
-		// description: Joi.string().required().messages({
-		// 	"string.base": "Description must be a string",
-		// 	"any.required": "Description is required",
-		// }),
+		title: Joi.string().max(255).optional().messages({
+			"string.base": "Title must be a string",
+			"string.max": "Title must be at most 255 characters long",
+			"any.required": "Title is required",
+		}),
+		slug: Joi.string().optional().messages({
+			"string.base": "Slug must be a string",
+			"any.required": "Slug is required",
+		}),
+		description: Joi.string().optional().messages({
+			"string.base": "Description must be a string",
+			"any.required": "Description is required",
+		}),
 		bannerUrl: Joi.string().uri().optional().messages({
 			"string.base": "Banner URL must be a string",
 			"string.uri": "Banner URL must be a valid URI",
