@@ -54,6 +54,7 @@ const homeRouter = require("./routes/homeRoutes");
 const emergencyInfoRouter = require("./routes/emergencyInfoRoutes");
 const instructionRouter = require("./routes/instructionRoutes");
 const eventCategoryRouter = require("./routes/eventCategoryRoutes");
+const sponsorsRouter = require("./routes/sponsorsRoutes");
 
 app.use(`/api/v1/auth`, authRouter);
 app.use(`/api/v1/events`, eventRouter);
@@ -61,6 +62,8 @@ app.use(`/api/v1/home`, homeRouter);
 app.use(`/api/v1/emergency-info`, emergencyInfoRouter);
 app.use(`/api/v1/instruction`, instructionRouter);
 app.use(`/api/v1/eventCategories`, eventCategoryRouter);
+app.use(`/api/v1/eventCategories`, eventCategoryRouter);
+app.use(`/api/v1/sponsors`, sponsorsRouter);
 
 app.get("/", (req, res) => {
 	res.status(200).json({message: "Welcome to evento API"});

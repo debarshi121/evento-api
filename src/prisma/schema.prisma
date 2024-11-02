@@ -56,6 +56,7 @@ model Event {
     status         Status
     emergencyInfos EmergencyInfo[]
     instructions   Instruction[]
+    sponsors       Sponsors[]
 }
 
 model Category {
@@ -105,4 +106,14 @@ model Instruction {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     event     Event    @relation(fields: [eventId], references: [id])
+}
+
+model Sponsors {
+    id          Int      @id @default(autoincrement())
+    eventId     Int
+    bannerUrl   String
+    redirectUrl String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    event       Event    @relation(fields: [eventId], references: [id])
 }

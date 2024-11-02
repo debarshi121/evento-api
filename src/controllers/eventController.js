@@ -42,6 +42,12 @@ const getSingleEvent = asyncHandler(async (req, res) => {
 					title: true,
 				},
 			},
+			sponsors: {
+				select: {
+					bannerUrl: true,
+					redirectUrl: true,
+				},
+			},
 		},
 	});
 
